@@ -26,5 +26,17 @@ const JOKE =
   'I finally hit inbox zero — I deleted everything, including the email saying I was fired.';
 
 const out = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
+
+// Self-check the gate before writing, so a bad edit can never ship a
+// rejected entry: UTF-8 text, 1–199 characters, not whitespace-only,
+// exactly one line. The joke is 88 characters.
+const chars = [...JOKE];
+if (JOKE.length < 1 || JOKE.length > 199 || JOKE.trim() === '' || JOKE.includes('\n')) {
+  throw new Error(`entry violates the gate: ${JOKE.length} chars`);
+}
+if (chars.length !== JOKE.length) {
+  throw new Error('entry must be plain single-line text');
+}
+
 mkdirSync(out, { recursive: true });
 writeFileSync(join(out, 'entry.txt'), JOKE, 'utf8');
